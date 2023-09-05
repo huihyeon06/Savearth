@@ -10,7 +10,7 @@ public class Main extends JFrame {
         setTitle("Savearth");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         Container c = getContentPane();
-        ImageIcon login = loadImageIcon("images/log_inc.png");
+        ImageIcon login = loadImageIcon("images/id.png");
 
         if (login != null) {
             int width = login.getIconWidth();
