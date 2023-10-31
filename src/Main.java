@@ -1,6 +1,18 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+
+
+
 
 public class Main {
 
@@ -9,6 +21,9 @@ public class Main {
     private static JTextField usernicknameField;
     private static JTextField lusernameField;
     private static JPasswordField lpasswordField;
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3308/savearth";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "1111";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -77,6 +92,9 @@ public class Main {
                 String password = new String(passwordField.getPassword());
                 String username = usernameField.getText();
 
+                registerUserToDatabase(username, password, usernickname);
+
+                frame3.setVisible(false);
 
             }
         });
@@ -107,6 +125,8 @@ public class Main {
         });
 
         // 창 1에 로그인 폼을 추가
+        ImagePanel imagePanel = new ImagePanel("images/background.png"); // 이미지 파일의 경로를 설정
+        frame1.setContentPane(imagePanel);
         frame1.setLayout(new java.awt.FlowLayout());
         frame1.add(loginButton);
         frame1.add(registerButton);
@@ -134,11 +154,15 @@ public class Main {
         frame3.add(usernameField); // 같은 JTextField를 사용하지만 다른 변수명을 사용하는 것이 좋습니다.
         frame3.add(new JLabel("비밀번호:"));
         frame3.add(passwordField);
+        frame3.add(rbutton);
         frame3.setSize(300, 200);
         frame3.setLocation(650,300);
         frame3.setVisible(false);
 
         //창 4에 내용을 추가
+
+        ImagePanel imagePanel2 = new ImagePanel("images/background.png"); // 이미지 파일의 경로를 설정
+        frame4.setContentPane(imagePanel2);
         frame4.setLayout(new java.awt.FlowLayout());
         frame4.add(startButton);
         frame4.add(storyButton);
@@ -152,5 +176,38 @@ public class Main {
     // 예시로 사용자 이름과 비밀번호가 "admin"일 때만 로그인 성공으로 간주
     private static boolean isValidLogin(String username, String password) {
         return username.equals("admin") && password.equals("admin");
+    }
+    private static void registerUserToDatabase(String username, String password, String usernickname) {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "INSERT INTO user (username, password, nickname) VALUES (?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, username);
+                statement.setString(2, password);
+                statement.setString(3, usernickname);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+class ImagePanel extends JPanel {
+    private Image backgroundImage;
+
+    public ImagePanel(String imagePath) {
+        try {
+            // 이미지를 불러와 Image 객체에 저장
+            backgroundImage = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // 배경 이미지를 그림
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
 }
