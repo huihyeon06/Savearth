@@ -21,7 +21,7 @@ public class Main {
     private static JTextField usernicknameField;
     private static JTextField lusernameField;
     private static JPasswordField lpasswordField;
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3308/savearth";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3308/savearth?useSSL=true&serverTimezone=UTC&requireSSL=true&verifyServerCertificate=false";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "1111";
 
@@ -178,15 +178,19 @@ public class Main {
         return username.equals("admin") && password.equals("admin");
     }
     private static void registerUserToDatabase(String username, String password, String usernickname) {
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "INSERT INTO user (username, password, nickname) VALUES (?, ?, ?)";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, username);
-                statement.setString(2, password);
-                statement.setString(3, usernickname);
-                statement.executeUpdate();
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+                String sql = "INSERT INTO user (username, password, nickname) VALUES (?, ?, ?)";
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    statement.setString(1, username);
+                    statement.setString(2, password);
+                    statement.setString(3, usernickname);
+                    statement.executeUpdate();
+                }
             }
-        } catch (SQLException e) {
+        }  catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
