@@ -102,7 +102,7 @@ public class Main {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Start start = new Start();
+                Start start = new Start(frame4);
                 start.f.setVisible(true);
                 frame4.setVisible(false);
             }
@@ -110,7 +110,7 @@ public class Main {
         storyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Story story = new Story();
+                Story story = new Story(frame4);
                 story.f2.setVisible(true);
                 frame4.setVisible(false);
             }
@@ -118,7 +118,7 @@ public class Main {
         rankButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Rank rank = new Rank();
+                Rank rank = new Rank(frame4);
                 rank.f3.setVisible(true);
                 frame4.setVisible(false);
             }
