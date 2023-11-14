@@ -5,13 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-
-
+import java.sql.*;
 
 
 public class Main {
@@ -187,7 +181,19 @@ public class Main {
 
     // 예시로 사용자 이름과 비밀번호가 "admin"일 때만 로그인 성공으로 간주
     private static boolean isValidLogin(String username, String password) {
-        return username.equals("admin") && password.equals("admin");
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT * FROM user WHERE name = ? AND password = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, username);
+                statement.setString(2, password);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    return resultSet.next(); // If a row is found, login is valid
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false; // In case of any exception, consider login as invalid
+        }
     }
 
 }
