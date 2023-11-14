@@ -21,8 +21,8 @@ public class Main {
     private static JTextField usernicknameField;
     private static JTextField lusernameField;
     private static JPasswordField lpasswordField;
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3308/savearth?useSSL=true&serverTimezone=UTC&requireSSL=true&verifyServerCertificate=false";
-    private static final String DB_USER = "root";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/savearth";
+    private static final String DB_USER = "huihyeon";
     private static final String DB_PASSWORD = "1111";
 
     public static void main(String[] args) {
@@ -92,9 +92,21 @@ public class Main {
                 String password = new String(passwordField.getPassword());
                 String username = usernameField.getText();
 
-                registerUserToDatabase(username, password, usernickname);
+                try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+                    String sql = "INSERT INTO user (name, password, nickname) VALUES (?, ?, ?)";
+                    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                        statement.setString(1, username);
+                        statement.setString(2, password);
+                        statement.setString(3, usernickname);
+                        statement.executeUpdate();
 
-                frame3.setVisible(false);
+                        JOptionPane.showMessageDialog(null, "회원가입이 완료되었습니다!");
+                        frame3.setVisible(false);
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "회원가입 중 오류가 발생했습니다.");
+                }
 
             }
         });
@@ -176,23 +188,6 @@ public class Main {
     // 예시로 사용자 이름과 비밀번호가 "admin"일 때만 로그인 성공으로 간주
     private static boolean isValidLogin(String username, String password) {
         return username.equals("admin") && password.equals("admin");
-    }
-    private static void registerUserToDatabase(String username, String password, String usernickname) {
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
-                String sql = "INSERT INTO user (username, password, nickname) VALUES (?, ?, ?)";
-                try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                    statement.setString(1, username);
-                    statement.setString(2, password);
-                    statement.setString(3, usernickname);
-                    statement.executeUpdate();
-                }
-            }
-        }  catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
     }
 
 }
