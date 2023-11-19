@@ -18,6 +18,8 @@ public class Main {
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/savearth";
     private static final String DB_USER = "huihyeon";
     private static final String DB_PASSWORD = "1111";
+    public static String userId = ""; // 기본적으로 빈 문자열로 초기화
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -59,6 +61,7 @@ public class Main {
                 String username = lusernameField.getText();
                 String password = new String(lpasswordField.getPassword());
                 if (isValidLogin(username, password)) {
+                    getUserId(username, password);
                     frame1.setVisible(false);
                     frame2.setVisible(false);
                     frame3.setVisible(false);
@@ -192,8 +195,30 @@ public class Main {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            return false; // In case of any exception, consider login as invalid
+            return false;
         }
+    }
+    private static String getUserId(String username, String password) {
+
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT id FROM user WHERE name = ? AND password = ?";
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, username);
+                statement.setString(2, password);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        userId = resultSet.getString("id"); // 결과에서 사용자 ID를 가져옴
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // 오류 처리
+        }
+
+        return userId;
     }
 
 }
