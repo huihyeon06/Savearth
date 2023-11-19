@@ -15,6 +15,8 @@ public class Start extends JFrame {
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/savearth";
     private static final String DB_USER = "huihyeon";
     private static final String DB_PASSWORD = "1111";
+    private static JLabel userTimeLabel;
+    private static String userTime="";
 
     public Start(JFrame frame4) {
 
@@ -39,6 +41,11 @@ public class Start extends JFrame {
         TimerThread runnable = new TimerThread(timerLabel);
         th = new Thread(runnable);
 
+        userTimeLabel = new JLabel();
+        userTimeLabel.setText(userTime);
+        userTimeLabel.setPreferredSize(new Dimension(200, 30));
+        gbc.insets = new Insets(0,0,0,20);
+        f.add(userTimeLabel,gbc);
 
         // 이전 버튼 설정
         beforeButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
@@ -96,6 +103,7 @@ public class Start extends JFrame {
                         progressBar.setVisible(false);
                         fillButton.setVisible(false);
                         timerLabel.setVisible(false);
+                        userTimeLabel.setVisible(true);
                         startButton.setVisible(true);
                         beforeButton.setVisible(true);
 
@@ -131,6 +139,7 @@ public class Start extends JFrame {
                 startTime = System.currentTimeMillis();
                 startButton.setVisible(false);
                 beforeButton.setVisible(false);
+                userTimeLabel.setVisible(false);
                 timerLabel.setVisible(true);
                 progressBar.setVisible(true);
                 fillButton.setVisible(true);
@@ -167,6 +176,7 @@ public class Start extends JFrame {
                             updateStatement.setString(2, userId);
                             updateStatement.executeUpdate();
                         }
+                        userTime = previousTime != null ? previousTime.toString() : "No time available";
                     }
                 }
             }
@@ -175,8 +185,6 @@ public class Start extends JFrame {
             // 오류 처리
         }
     }
-
-
 
     public static void main(String[] args) {
         JFrame frame4 = new JFrame(); // frame4를 생성

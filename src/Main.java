@@ -33,7 +33,24 @@ public class Main {
         JFrame frame3 = new JFrame("SignUp");
         JFrame frame4 = new JFrame("second");
 
-        JButton loginButton = new JButton("로그인");
+        ImageIcon login = new ImageIcon("images/login.png");
+        ImageIcon signup = new ImageIcon("images/signup.png");
+        ImageIcon start = new ImageIcon("images/start.png");
+        ImageIcon prologue = new ImageIcon("images/prologue.png");
+        ImageIcon ranking = new ImageIcon("images/ranking.png");
+
+        JButton loginButton = new JButton("로그인");/*{
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (getModel().isPressed()) {
+                    g.setColor(new Color(255, 0, 0, 100)); // 클릭 시 버튼의 색
+                } else {
+                    g.setColor(new Color(0, 0, 0, 0)); // 버튼을 투명하게 만듦
+                }
+                g.fillRect(0, 0, getWidth(), getHeight()); // 버튼의 배경을 색으로 채움
+                super.paintComponent(g);
+            }
+        };*/
         JButton registerButton = new JButton("회원가입");
 
         JButton startButton = new JButton("시작");
@@ -220,6 +237,7 @@ public class Main {
 
         return userId;
     }
+
 
 }
 class ImagePanel extends JPanel {
