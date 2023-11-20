@@ -16,7 +16,6 @@ public class Start extends JFrame {
     private static final String DB_USER = "huihyeon";
     private static final String DB_PASSWORD = "1111";
     private static JLabel userTimeLabel;
-    private static String userTime="";
 
     public Start(JFrame frame4) {
 
@@ -37,24 +36,34 @@ public class Start extends JFrame {
         JButton startButton =new JButton("시작");
         JButton beforeButton = new JButton("이전");
 
+        Font customFont = new Font("C:\\Windows\\Fonts", Font.BOLD, 25); // Arial 폰트, Bold 스타일, 크기 16
+
+        JLabel username = new JLabel(username(Main.userId));
+        username.setPreferredSize(new Dimension(200, 30));
+        username.setFont(customFont); // 사용자 지정 폰트 설정
+        gbc.insets = new Insets(0, 400, 400, 0);
+        f.add(username, gbc);
+
         JLabel timerLabel = new JLabel();
         TimerThread runnable = new TimerThread(timerLabel);
         th = new Thread(runnable);
 
         userTimeLabel = new JLabel();
-        userTimeLabel.setText(userTime);
         userTimeLabel.setPreferredSize(new Dimension(200, 30));
-        gbc.insets = new Insets(0,0,0,20);
-        f.add(userTimeLabel,gbc);
+        userTimeLabel.setFont(customFont); // 사용자 지정 폰트 설정
+        gbc.insets = new Insets(0, 0, 350, 0);
+        f.add(userTimeLabel, gbc);
+
+        fetchUserTime(Main.userId);
 
         // 이전 버튼 설정
         beforeButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
-        gbc.insets = new Insets(0, 0, -400, 500); // 오른쪽 여백 추가
+        gbc.insets = new Insets(0, 0, -300, 500); // 오른쪽 여백 추가
         f.add(beforeButton, gbc);
 
         // 시작 버튼 설정
         startButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
-        gbc.insets = new Insets(0, 0, -400, 250); // 오른쪽 여백 추가
+        gbc.insets = new Insets(0, 0, -300, 250); // 오른쪽 여백 추가
         f.add(startButton, gbc);
 
         // progress bar 위치와 여백 설정
@@ -87,13 +96,7 @@ public class Start extends JFrame {
                     ((Timer) e.getSource()).stop();
                     long endTime = System.currentTimeMillis(); // 타이머 완료 시간을 저장
                     long elapsedTime = endTime - startTime; // 경과 시간 계산 (밀리초 단위)
-                    //double seconds = elapsedTime / 1000.0; // 전체 초 계산
-                    // 초와 밀리초를 JLabel에 표시
-                    //timerLabel.setText(String.format("%.2f s", seconds));
-                    //int secs = (int) (seconds % 60);
-                    //int millisecs = (int) (elapsedTime % 1000);
-                    // 시간을 시분초밀리초 형태로 표시
-                    //timerLabel.setText(String.format("%02d:%02d", secs, millisecs));
+
                     if (elapsedTime > 30000) { // 30초(30000 밀리초)보다 적은 경우
                         JOptionPane.showMessageDialog(f, "지구를 지키지 못했습니다!");
                     } else {
@@ -109,7 +112,6 @@ public class Start extends JFrame {
 
                         insertElapsedTime(Main.userId, elapsedTime);
                     }
-                    //JOptionPane.showMessageDialog(f, "게이지바가 100%로 채워지는 데 " + elapsedTime / 1000 + " 초 소요되었습니다.");
                 } else {
                     progressValue--;
                     progressBar.setValue(progressValue);
@@ -124,7 +126,6 @@ public class Start extends JFrame {
                 progressValue++;
                 progressBar.setValue(progressValue);
                 timer.start();
-                //startTime = System.currentTimeMillis();
             }
         });
 
@@ -159,7 +160,43 @@ public class Start extends JFrame {
 
     }
 
-    public static void insertElapsedTime(String userId, long elapsedTime) {
+    public String username(String userId){
+        String uname="";
+        try(Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)){
+            String sql = "SELECT name FROM user WHERE id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql)){
+                statement.setString(1,userId);
+                ResultSet resultSet = statement.executeQuery();
+
+                if(resultSet.next()){
+                    uname = resultSet.getString("name");
+                }
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        return uname;
+    }
+
+    public void fetchUserTime(String userId) {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+            String selectSql = "SELECT time FROM user WHERE id = ?";
+            try (PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+                selectStatement.setString(1, userId);
+                ResultSet resultSet = selectStatement.executeQuery();
+
+                if (resultSet.next()) {
+                    double timeFromDB = resultSet.getLong("time")/1000.0;
+                    String userTime = timeFromDB != 0 ? "최단시간 : "+String.format("%.2f",timeFromDB)+"초" : "집계되지 않음";
+                    userTimeLabel.setText(userTime);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // 오류 처리
+        }
+    }
+    public static void insertElapsedTime(String userId, long elapsedTimeMillis) {
         try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
             String selectSql = "SELECT time FROM user WHERE id = ?";
             String updateSql = "UPDATE user SET time = ? WHERE id = ?";
@@ -169,14 +206,16 @@ public class Start extends JFrame {
                 ResultSet resultSet = selectStatement.executeQuery();
 
                 if (resultSet.next()) {
-                    Timestamp previousTime = resultSet.getTimestamp("time");
-                    if (previousTime==null || elapsedTime < previousTime.getTime()) {
+                    long previousTime = resultSet.getLong("time");
+
+                    if (previousTime == 0 || elapsedTimeMillis < previousTime) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
-                            updateStatement.setTimestamp(1, new Timestamp(elapsedTime));
+                            updateStatement.setLong(1, elapsedTimeMillis);
                             updateStatement.setString(2, userId);
                             updateStatement.executeUpdate();
+
+                            userTimeLabel.setText(String.valueOf(elapsedTimeMillis));
                         }
-                        userTime = previousTime != null ? previousTime.toString() : "No time available";
                     }
                 }
             }
@@ -185,6 +224,7 @@ public class Start extends JFrame {
             // 오류 처리
         }
     }
+
 
     public static void main(String[] args) {
         JFrame frame4 = new JFrame(); // frame4를 생성

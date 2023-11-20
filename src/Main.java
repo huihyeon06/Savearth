@@ -156,6 +156,7 @@ public class Main {
                 Rank rank = new Rank(frame4);
                 rank.f3.setVisible(true);
                 frame4.setVisible(false);
+                frame1.setVisible(false);
             }
         });
 

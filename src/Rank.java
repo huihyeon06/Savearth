@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.time.Instant;
 
 public class Rank extends JFrame {
     public JFrame f3;
@@ -48,40 +49,30 @@ public class Rank extends JFrame {
 
     public void fetchAndDisplayRanking() {
         try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
-            String selectSql = "SELECT nickname, time FROM user ORDER BY time ASC"; // 시간순으로 정렬된 랭킹 조회
+            String selectSql = "SELECT nickname, time FROM user ORDER BY time ASC"; // 밀리초 단위로 저장된 필드를 가져옴
             try (PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
                 ResultSet resultSet = selectStatement.executeQuery();
 
                 StringBuilder ranking = new StringBuilder();
                 int rank = 1;
+
                 while (resultSet.next()) {
                     String userNickname = resultSet.getString("nickname");
-                    Timestamp userTimestamp = resultSet.getTimestamp("time");
+                    long milliseconds = resultSet.getLong("time");
 
-                    // 초와 밀리초를 포함한 시간 정보를 표시
-                    long milliseconds = userTimestamp.getTime(); // 타임스탬프를 milliseconds로 변환
-                    long seconds = milliseconds / 1000;
-
-                    if(userTimestamp==null){
-                        ranking.append(rank).append(". "+"\t").append(userNickname)
-                                .append("\t"+": "+"\t").append(" 기록 없음 ")
-                                .append("\n");
+                    if (milliseconds > 0) {
+                        double seconds = milliseconds / 1000.0; // 밀리초를 초로 변환
+                        ranking.append(rank).append(". \t").append(userNickname)
+                                .append("\t: \t").append(String.format("%.2f", seconds)) // 두 자리까지 표시
+                                .append(" 초\n");
+                        rank++;
                     }
-                    ranking.append(rank).append(". "+"\t").append(userNickname)
-                            .append("\t"+": "+"\t").append(seconds).append(" 초 ")
-                            .append("\n");
-                    rank++;
                 }
-
-                SwingUtilities.invokeLater(() -> {
-                    rankTextArea.setText(ranking.toString()); // UI 갱신 스레드 안에서 텍스트 설정
-                    //f3.repaint(); // 창 새로고침
-                });
+                rankTextArea.setText(ranking.toString());
 
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            // 오류 처리
         }
     }
 
