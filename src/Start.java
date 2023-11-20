@@ -39,9 +39,12 @@ public class Start extends JFrame {
         Font customFont = new Font("C:\\Windows\\Fonts", Font.BOLD, 25); // Arial 폰트, Bold 스타일, 크기 16
 
         JLabel username = new JLabel(username(Main.userId));
-        username.setPreferredSize(new Dimension(200, 30));
-        username.setFont(customFont); // 사용자 지정 폰트 설정
-        gbc.insets = new Insets(0, 400, 400, 0);
+        username.setFont(customFont);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2; // 두 열을 차지하도록 함
+        gbc.anchor = GridBagConstraints.NORTHWEST; // 왼쪽 상단 정렬
+        gbc.insets = new Insets(50, 50, 10, 50); // 여백 조정
         f.add(username, gbc);
 
         JLabel timerLabel = new JLabel();
@@ -49,21 +52,28 @@ public class Start extends JFrame {
         th = new Thread(runnable);
 
         userTimeLabel = new JLabel();
-        userTimeLabel.setPreferredSize(new Dimension(200, 30));
         userTimeLabel.setFont(customFont); // 사용자 지정 폰트 설정
-        gbc.insets = new Insets(0, 0, 350, 0);
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST; // 왼쪽 상단 정렬
+        gbc.insets = new Insets(10, 100, 100, 100); // 여백 조정
         f.add(userTimeLabel, gbc);
 
         fetchUserTime(Main.userId);
 
         // 이전 버튼 설정
         beforeButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
-        gbc.insets = new Insets(0, 0, -300, 500); // 오른쪽 여백 추가
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1; // 한 열만 차지하도록 함
+        gbc.anchor = GridBagConstraints.SOUTHWEST; // 왼쪽 아래 정렬
+        gbc.insets = new Insets(0, 50, 50, 50); // 여백 조정
         f.add(beforeButton, gbc);
 
         // 시작 버튼 설정
         startButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
-        gbc.insets = new Insets(0, 0, -300, 250); // 오른쪽 여백 추가
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.SOUTH; // 아래쪽 중앙 정렬
+        gbc.insets = new Insets(0, 50, 50, 50); // 여백 조정
         f.add(startButton, gbc);
 
         // progress bar 위치와 여백 설정
@@ -74,14 +84,15 @@ public class Start extends JFrame {
         progressBar.setVisible(false);
 
         // timer label 위치와 여백 설정
-        gbc.gridy = 1;
-        gbc.insets = new Insets(10, 0, 0, 20); // 여백 조정
+        gbc.gridy=1;
+        gbc.insets = new Insets(10, 0, 400, 20); // 여백 조정
+        timerLabel.setFont(customFont);
         f.add(timerLabel, gbc);
         timerLabel.setVisible(false);
 
         // fill button 위치와 여백 설정
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         gbc.insets = new Insets(20, 20, 20, 20); // 여백 조정
         gbc.anchor = GridBagConstraints.CENTER; // 가운데 정렬
         gbc.weighty = 1.0; // 버튼이 공간을 차지하는 정도 설정
@@ -97,20 +108,22 @@ public class Start extends JFrame {
                     long endTime = System.currentTimeMillis(); // 타이머 완료 시간을 저장
                     long elapsedTime = endTime - startTime; // 경과 시간 계산 (밀리초 단위)
 
-                    if (elapsedTime > 30000) { // 30초(30000 밀리초)보다 적은 경우
+                    if (elapsedTime > 50000) { // 30초(30000 밀리초)보다 적은 경우
                         JOptionPane.showMessageDialog(f, "지구를 지키지 못했습니다!");
                     } else {
-                        JOptionPane.showMessageDialog(f, "Next Level");
+                        JOptionPane.showMessageDialog(f, "성공!");
                         progressValue=0;
                         progressBar.setValue(progressValue);
                         progressBar.setVisible(false);
                         fillButton.setVisible(false);
                         timerLabel.setVisible(false);
+                        username.setVisible(true);
                         userTimeLabel.setVisible(true);
                         startButton.setVisible(true);
                         beforeButton.setVisible(true);
 
                         insertElapsedTime(Main.userId, elapsedTime);
+                        fetchUserTime(Main.userId);
                     }
                 } else {
                     progressValue--;
@@ -141,11 +154,13 @@ public class Start extends JFrame {
                 startButton.setVisible(false);
                 beforeButton.setVisible(false);
                 userTimeLabel.setVisible(false);
+                username.setVisible(false);
                 timerLabel.setVisible(true);
                 progressBar.setVisible(true);
                 fillButton.setVisible(true);
                 timerLabel.setText("00:00");
                 f.revalidate();
+
             }
         });
 
@@ -163,13 +178,13 @@ public class Start extends JFrame {
     public String username(String userId){
         String uname="";
         try(Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)){
-            String sql = "SELECT name FROM user WHERE id = ?";
+            String sql = "SELECT nickname FROM user WHERE id = ?";
             try(PreparedStatement statement = connection.prepareStatement(sql)){
                 statement.setString(1,userId);
                 ResultSet resultSet = statement.executeQuery();
 
                 if(resultSet.next()){
-                    uname = resultSet.getString("name");
+                    uname = resultSet.getString("nickname");
                 }
             }
         }catch (SQLException ex){
@@ -186,9 +201,11 @@ public class Start extends JFrame {
                 ResultSet resultSet = selectStatement.executeQuery();
 
                 if (resultSet.next()) {
-                    double timeFromDB = resultSet.getLong("time")/1000.0;
-                    String userTime = timeFromDB != 0 ? "최단시간 : "+String.format("%.2f",timeFromDB)+"초" : "집계되지 않음";
+                    long timeFromDB = resultSet.getLong("time");
+                    double timeInSeconds = timeFromDB / 1000.0;
+                    String userTime = timeInSeconds != 0 ? "최단시간: " + String.format("%.2f", timeInSeconds) + "초" : "집계되지 않음";
                     userTimeLabel.setText(userTime);
+                    f.repaint();
                 }
             }
         } catch (SQLException ex) {
@@ -196,6 +213,7 @@ public class Start extends JFrame {
             // 오류 처리
         }
     }
+
     public static void insertElapsedTime(String userId, long elapsedTimeMillis) {
         try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
             String selectSql = "SELECT time FROM user WHERE id = ?";

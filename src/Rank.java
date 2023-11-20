@@ -76,6 +76,8 @@ public class Rank extends JFrame {
         }
     }
 
+
+
     public static void main(String[] args) {
         JFrame frame4 = new JFrame();
         Rank rank = new Rank(frame4); // 랭킹 데이터 가져와 화면에 표시

@@ -163,7 +163,7 @@ public class Main {
         // 창 1에 로그인 폼을 추가
         ImagePanel imagePanel = new ImagePanel("images/background.png"); // 이미지 파일의 경로를 설정
         frame1.setContentPane(imagePanel);
-        frame1.setLayout(new java.awt.FlowLayout());
+        frame1.setLayout(new GridLayout(5, 1, 0, 0));
         frame1.add(loginButton);
         frame1.add(registerButton);
         frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -199,7 +199,7 @@ public class Main {
 
         ImagePanel imagePanel2 = new ImagePanel("images/background.png"); // 이미지 파일의 경로를 설정
         frame4.setContentPane(imagePanel2);
-        frame4.setLayout(new java.awt.FlowLayout());
+        frame4.setLayout(new GridLayout(5, 1, 0, 0));
         frame4.add(startButton);
         frame4.add(storyButton);
         frame4.add(rankButton);
