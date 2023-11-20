@@ -35,6 +35,9 @@ public class Rank extends JFrame {
         scrollPane.setPreferredSize(new Dimension(600, 500));
 
         f3 = new JFrame("Ranking");
+        ImagePanel background = new ImagePanel("images/background.png");
+        f3.setContentPane(background);
+
         f3.setLayout(new java.awt.FlowLayout());
         f3.setSize(1100, 600);
         f3.setLocation(250, 100);
