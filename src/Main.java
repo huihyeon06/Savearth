@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
@@ -38,6 +40,13 @@ public class Main {
         ImageIcon start = new ImageIcon("images/start.png");
         ImageIcon prologue = new ImageIcon("images/prologue.png");
         ImageIcon ranking = new ImageIcon("images/ranking.png");
+
+        ImageIcon login_ = new ImageIcon("images/login_.png");
+        ImageIcon signup_ = new ImageIcon("images/signup_.png");
+        ImageIcon start_ = new ImageIcon("images/start_.png");
+        ImageIcon prologue_ = new ImageIcon("images/prologue_.png");
+        ImageIcon ranking_ = new ImageIcon("images/ranking_.png");
+
 
         JButton loginButton = new JButton(login);
         loginButton.setBorderPainted(false);
@@ -80,6 +89,18 @@ public class Main {
             }
         });
 
+        loginButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                loginButton.setIcon(login_);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                loginButton.setIcon(login);
+            }
+        });
+
         JButton lButton = new JButton("확인");
         lButton.addActionListener(new ActionListener() {
             @Override
@@ -103,6 +124,18 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 frame3.setVisible(true);
                 frame2.setVisible(false);
+            }
+        });
+
+        registerButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                registerButton.setIcon(signup_);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                registerButton.setIcon(signup);
             }
         });
 
@@ -142,12 +175,34 @@ public class Main {
                 frame4.setVisible(false);
             }
         });
+        startButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                startButton.setIcon(start_);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                startButton.setIcon(start);
+            }
+        });
         storyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Story story = new Story(frame4);
                 story.f2.setVisible(true);
                 frame4.setVisible(false);
+            }
+        });
+        storyButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                storyButton.setIcon(prologue_);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                storyButton.setIcon(prologue);
             }
         });
         rankButton.addActionListener(new ActionListener() {
@@ -157,6 +212,17 @@ public class Main {
                 rank.f3.setVisible(true);
                 frame4.setVisible(false);
                 frame1.setVisible(false);
+            }
+        });
+        rankButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                rankButton.setIcon(ranking_);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                rankButton.setIcon(ranking);
             }
         });
 
@@ -207,6 +273,8 @@ public class Main {
         frame4.setSize(1100, 600);
         frame4.setLocation(250,100);
         frame4.setVisible(false);
+
+
     }
 
     // 예시로 사용자 이름과 비밀번호가 "admin"일 때만 로그인 성공으로 간주
@@ -247,6 +315,7 @@ public class Main {
 
         return userId;
     }
+
 
 
 }

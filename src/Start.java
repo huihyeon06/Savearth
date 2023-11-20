@@ -21,30 +21,52 @@ public class Start extends JFrame {
 
         this.frame4=frame4;
 
+        ImageIcon start_b = new ImageIcon("images/start_b.png");
+        ImageIcon back = new ImageIcon("images/back.png");
+        ImageIcon prevent = new ImageIcon("images/prevent.png");
+
+
+
+        progressBar = new JProgressBar(0, 10);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
+
+        JButton fillButton = new JButton(prevent);
+        fillButton.setBorderPainted(false);
+        fillButton.setContentAreaFilled(false);
+        fillButton.setFocusPainted(false);
+        fillButton.setOpaque(false);
+        JButton startButton =new JButton(start_b);
+        startButton.setBorderPainted(false);
+        startButton.setContentAreaFilled(false);
+        startButton.setFocusPainted(false);
+        startButton.setOpaque(false);
+        JButton beforeButton = new JButton(back);
+        beforeButton.setBorderPainted(false);
+        beforeButton.setContentAreaFilled(false);
+        beforeButton.setFocusPainted(false);
+        beforeButton.setOpaque(false);
+
         f = new JFrame();
+        ImagePanel background = new ImagePanel("images/background2.png");
+        f.setContentPane(background);
         f.setLayout(new java.awt.GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         f.setSize(1100, 600);
         f.setLocation(250, 100);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        progressBar = new JProgressBar(0, 10);
-        progressBar.setValue(0);
-        progressBar.setStringPainted(true);
-
-        JButton fillButton = new JButton("게이지바 채우기");
-        JButton startButton =new JButton("시작");
-        JButton beforeButton = new JButton("이전");
-
         Font customFont = new Font("C:\\Windows\\Fonts", Font.BOLD, 25); // Arial 폰트, Bold 스타일, 크기 16
 
+
+        // JLabel 생성 후 HTML 문자열 설정
         JLabel username = new JLabel(username(Main.userId));
         username.setFont(customFont);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2; // 두 열을 차지하도록 함
         gbc.anchor = GridBagConstraints.NORTHWEST; // 왼쪽 상단 정렬
-        gbc.insets = new Insets(50, 50, 10, 50); // 여백 조정
+        gbc.insets = new Insets(50, 100, 10, 50); // 여백 조정
         f.add(username, gbc);
 
         JLabel timerLabel = new JLabel();
@@ -55,13 +77,12 @@ public class Start extends JFrame {
         userTimeLabel.setFont(customFont); // 사용자 지정 폰트 설정
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST; // 왼쪽 상단 정렬
-        gbc.insets = new Insets(10, 100, 100, 100); // 여백 조정
+        gbc.insets = new Insets(10, 180, 100, 100); // 여백 조정
         f.add(userTimeLabel, gbc);
 
         fetchUserTime(Main.userId);
 
         // 이전 버튼 설정
-        beforeButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1; // 한 열만 차지하도록 함
@@ -70,7 +91,6 @@ public class Start extends JFrame {
         f.add(beforeButton, gbc);
 
         // 시작 버튼 설정
-        startButton.setPreferredSize(new Dimension(100, 30)); // 버튼 크기 설정 (임의의 크기)
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.SOUTH; // 아래쪽 중앙 정렬
         gbc.insets = new Insets(0, 50, 50, 50); // 여백 조정
