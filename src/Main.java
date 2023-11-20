@@ -39,23 +39,32 @@ public class Main {
         ImageIcon prologue = new ImageIcon("images/prologue.png");
         ImageIcon ranking = new ImageIcon("images/ranking.png");
 
-        JButton loginButton = new JButton("로그인");/*{
-            @Override
-            protected void paintComponent(Graphics g) {
-                if (getModel().isPressed()) {
-                    g.setColor(new Color(255, 0, 0, 100)); // 클릭 시 버튼의 색
-                } else {
-                    g.setColor(new Color(0, 0, 0, 0)); // 버튼을 투명하게 만듦
-                }
-                g.fillRect(0, 0, getWidth(), getHeight()); // 버튼의 배경을 색으로 채움
-                super.paintComponent(g);
-            }
-        };*/
-        JButton registerButton = new JButton("회원가입");
+        JButton loginButton = new JButton(login);
+        loginButton.setBorderPainted(false);
+        loginButton.setContentAreaFilled(false);
+        loginButton.setFocusPainted(false);
+        loginButton.setOpaque(false);
+        JButton registerButton = new JButton(signup);
+        registerButton.setBorderPainted(false);
+        registerButton.setContentAreaFilled(false);
+        registerButton.setFocusPainted(false);
+        registerButton.setOpaque(false);
 
-        JButton startButton = new JButton("시작");
-        JButton storyButton = new JButton("프롤로그");
-        JButton rankButton = new JButton("랭킹");
+        JButton startButton = new JButton(start);
+        startButton.setBorderPainted(false);
+        startButton.setContentAreaFilled(false);
+        startButton.setFocusPainted(false);
+        startButton.setOpaque(false);
+        JButton storyButton = new JButton(prologue);
+        storyButton.setBorderPainted(false);
+        storyButton.setContentAreaFilled(false);
+        storyButton.setFocusPainted(false);
+        storyButton.setOpaque(false);
+        JButton rankButton = new JButton(ranking);
+        rankButton.setBorderPainted(false);
+        rankButton.setContentAreaFilled(false);
+        rankButton.setFocusPainted(false);
+        rankButton.setOpaque(false);
 
         lusernameField = new JTextField(20);
         lpasswordField = new JPasswordField(20);

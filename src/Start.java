@@ -79,7 +79,7 @@ public class Start extends JFrame {
         f.add(fillButton, gbc);
         fillButton.setVisible(false);
 
-        timer = new Timer(600, new ActionListener() {
+        timer = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (progressValue >= 10) {

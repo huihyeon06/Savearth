@@ -24,29 +24,26 @@ public class Rank extends JFrame {
         });
 
         rankTextArea = new JTextArea(30, 50);
-        rankTextArea.setEditable(false); //수정 못하게 함
+        rankTextArea.setEditable(false);
+        Font font = new Font("C:\\Windows\\Fonts", Font.PLAIN, 16);
+        rankTextArea.setFont(font);
 
         JScrollPane scrollPane = new JScrollPane(rankTextArea);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); //수직 스크롤 바를 항상 표시
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(600, 500));
 
         f3 = new JFrame("Ranking");
-        f3.setLayout(new GridBagLayout());
+        f3.setLayout(new java.awt.FlowLayout());
         f3.setSize(1100, 600);
         f3.setLocation(250, 100);
         f3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; // 왼쪽 정렬
-        gbc.gridy = 1; // 밑에 위치
-        gbc.anchor = GridBagConstraints.WEST; // 왼쪽 정렬
-        f3.add(beforeButton, gbc); // 버튼 추가
-
-        gbc.gridx = 0; // 왼쪽 정렬
-        gbc.gridy = 0; // 위쪽 위치
-        gbc.fill = GridBagConstraints.BOTH; // 컴포넌트가 가로, 세로로 확장되도록 설정
-        gbc.weightx = 1.0; // 버튼이 가로 방향으로 차지하는 공간 설정
-        gbc.weighty = 1.0; // 버튼이 세로 방향으로 차지하는 공간 설정
-        f3.add(scrollPane, gbc); // JTextArea 및 JScrollPane 추가
+        f3.setVisible(true);
+        f3.add(scrollPane);
+        f3.add(beforeButton);
+        scrollPane.repaint();
+        fetchAndDisplayRanking();
     }
 
     public void fetchAndDisplayRanking() {
@@ -59,13 +56,28 @@ public class Rank extends JFrame {
                 int rank = 1;
                 while (resultSet.next()) {
                     String userNickname = resultSet.getString("nickname");
-                    Timestamp userTime = resultSet.getTimestamp("time");
-                    System.out.println(userNickname + ": " + userTime);
-                    ranking.append(rank).append(". ").append(userNickname).append(": ").append(userTime).append("\n");
+                    Timestamp userTimestamp = resultSet.getTimestamp("time");
+
+                    // 초와 밀리초를 포함한 시간 정보를 표시
+                    long milliseconds = userTimestamp.getTime(); // 타임스탬프를 milliseconds로 변환
+                    long seconds = milliseconds / 1000;
+
+                    if(userTimestamp==null){
+                        ranking.append(rank).append(". "+"\t").append(userNickname)
+                                .append("\t"+": "+"\t").append(" 기록 없음 ")
+                                .append("\n");
+                    }
+                    ranking.append(rank).append(". "+"\t").append(userNickname)
+                            .append("\t"+": "+"\t").append(seconds).append(" 초 ")
+                            .append("\n");
                     rank++;
                 }
 
-                rankTextArea.setText(ranking.toString());
+                SwingUtilities.invokeLater(() -> {
+                    rankTextArea.setText(ranking.toString()); // UI 갱신 스레드 안에서 텍스트 설정
+                    //f3.repaint(); // 창 새로고침
+                });
+
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -75,8 +87,7 @@ public class Rank extends JFrame {
 
     public static void main(String[] args) {
         JFrame frame4 = new JFrame();
-        Rank rank = new Rank(frame4);
-        rank.fetchAndDisplayRanking();
-        rank.f3.setVisible(true);
+        Rank rank = new Rank(frame4); // 랭킹 데이터 가져와 화면에 표시
+        rank.f3.setVisible(false);
     }
 }
