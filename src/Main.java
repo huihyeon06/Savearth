@@ -156,7 +156,7 @@ public class Main {
                         statement.setString(3, usernickname);
                         statement.executeUpdate();
 
-                        JOptionPane.showMessageDialog(null, "회원가입이 완료되었습니다!");
+                        JOptionPane.showMessageDialog(null, "회원가입이 완료되었습니다");
                         frame3.setVisible(false);
                     }
                 } catch (SQLException ex) {
